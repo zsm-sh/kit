@@ -1,0 +1,2 @@
+
+require::git vendor/embed https://github.com/zsm-sh/embed v0.0.1 3bc6e36613c21f674bdc19562faec39ec1a6e51d
