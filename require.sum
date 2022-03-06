@@ -1,2 +1,3 @@
 
-require::git vendor/embed https://github.com/zsm-sh/embed v0.0.1 3bc6e36613c21f674bdc19562faec39ec1a6e51d
+require::git vendor/embed https://github.com/zsm-sh/embed v0.0.2 e67504ef113e80e22bc20e26f338d6281b1c12a1
+require::git vendor/std https://github.com/zsm-sh/std v0.0.1 37cefb18b18db9b25e9bce00ec2949756a601099

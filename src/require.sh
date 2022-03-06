@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-source "$(dirname "${BASH_SOURCE[0]}")/crypto/sha256/sum.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/log/error.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/log/info.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/utils/download.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/utils/git_fetch.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/utils/git_sum.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/utils/git_latest_tag.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vendor/std/src/crypto/sha256/sum.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vendor/std/src/log/error.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vendor/std/src/log/info.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vendor/std/src/http/download.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/git/fetch.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/git/sum.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/git/latest_tag.sh"
 
 
 
@@ -19,7 +19,7 @@ function require::file() {
     local file="${1}"
     local url="${2}"
     local checksum="${3:-}"
-    utils::download "${file}" "${url}"
+    http::download "${file}" "${url}"
     if [[ "${checksum}" == "" ]]; then
         checksum=$(crypto::sha256::sum "${file}")
         if [[ "${checksum}" == "" ]]; then
@@ -43,21 +43,21 @@ function require::git() {
     local tag="${3:-}"
     local checksum="${4:-}"
 
-    utils::git_fetch "${dir}" "${url}" "${tag}"
+    git::fetch "${dir}" "${url}" "${tag}"
 
     if [[ "${tag}" == "" ]]; then
-        tag=$(utils::git_latest_tag "${dir}")
+        tag=$(git::latest_tag "${dir}")
         if [[ "${tag}" == "" ]]; then
             log::error "Fail get tag of ${dir}"
             return 1
         fi
-        utils::git_fetch "${dir}" "${url}" "${tag}"
+        git::fetch "${dir}" "${url}" "${tag}"
         sed "s| ${dir} ${url}$| ${dir} ${url} ${tag}|" "${modfile}" > "${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
     if [[ "${checksum}" == "" ]]; then
-        checksum=$(utils::git_sum "${dir}")
+        checksum=$(git::sum "${dir}")
         if [[ "${checksum}" == "" ]]; then
             log::error "Fail get hash of ${dir}"
             return 1
@@ -66,8 +66,8 @@ function require::git() {
         mv "${modfile}.tmp" "${modfile}"
     fi
 
-    if [[ "${checksum}" != "$(utils::git_sum "${dir}")" ]]; then
-        log::error "Git repo ${dir} downloaded but its checksum is incorrect (expected ${checksum}, got $(utils::git_sum "${dir}"))"
+    if [[ "${checksum}" != "$(git::sum "${dir}")" ]]; then
+        log::error "Git repo ${dir} downloaded but its checksum is incorrect (expected ${checksum}, got $(git::sum "${dir}"))"
         return 1
     fi
 }

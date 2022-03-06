@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function utils::git_sum() (
+function git::sum() (
     local dir="${1}"
 
     cd "${dir}" || return 1

@@ -4,4 +4,4 @@ CURRENT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
 "${CURRENT_DIR}/require.sh" "${CURRENT_DIR}/../require.sum"
 
-bash "${CURRENT_DIR}/../vendor/embed/embed.sh" "${CURRENT_DIR}/require.sh" > "${CURRENT_DIR}/../require.sh"
+bash "${CURRENT_DIR}/../vendor/embed/embed.sh" --once=y "${CURRENT_DIR}/require.sh" > "${CURRENT_DIR}/../require.sh"

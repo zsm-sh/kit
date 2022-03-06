@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-source "$(dirname "${BASH_SOURCE[0]}")/../log/info.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../vendor/std/src/log/info.sh"
 
-function utils::git_fetch() (
+function git::fetch() (
     local dir="${1}"
     local repo="${2}"
     local tag="${3:-}"

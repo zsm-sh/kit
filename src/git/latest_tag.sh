@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function utils::git_latest_tag() (
+function git::latest_tag() (
     local dir="${1}"
 
     cd "${dir}" || return 1
