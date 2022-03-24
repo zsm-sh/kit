@@ -21,7 +21,7 @@ function kit::file() {
             return 1
         fi
 
-        sed "s| ${file} ${url}$| ${file} ${url} ${checksum}|" "${modfile}" > "${modfile}.tmp"
+        sed "s| ${file} ${url}$| ${file} ${url} ${checksum}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
@@ -56,7 +56,7 @@ function kit::git() {
             return 1
         fi
         git::fetch "${dir}" "${url}" "${tag}"
-        sed "s| ${dir} ${url}$| ${dir} ${url} ${tag}|" "${modfile}" > "${modfile}.tmp"
+        sed "s| ${dir} ${url}$| ${dir} ${url} ${tag}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
@@ -66,7 +66,7 @@ function kit::git() {
             log::error "Fail get hash of ${dir}"
             return 1
         fi
-        sed "s| ${dir} ${url} ${tag}$| ${dir} ${url} ${tag} ${checksum}|" "${modfile}" > "${modfile}.tmp"
+        sed "s| ${dir} ${url} ${tag}$| ${dir} ${url} ${tag} ${checksum}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
@@ -85,7 +85,7 @@ function kit() {
     IFS=$'\n'
     for line in $(cat "${modfile}"); do
         unset IFS
-        read -r -a line <<< "${line}"
+        read -r -a line <<<"${line}"
         IFS=$'\n'
         if [[ "${line[0]}" == "file" ]]; then
             kit::file "${line[1]}" "${line[2]}" "${line[3]}"
@@ -103,6 +103,29 @@ function kit() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    modfile="${1}"
-    kit "${modfile}"
+    function usage() {
+        echo "Usage: ${0} <file>"
+        echo
+        echo "Setup the kit from the given file."
+        echo
+        echo "Example:"
+        echo "  ${0} kitfile.kit"
+        echo
+        exit 1
+    }
+
+    function main() {
+        local modfile="${1}"
+        if [[ "${modfile}" == "" ]]; then
+            log::error "Missing kitfile.kit"
+            usage
+        fi
+        if [[ ! -f "${modfile}" ]]; then
+            log::error "File ${modfile} not found"
+            usage
+        fi
+        kit "${modfile}"
+    }
+
+    main "${@}"
 fi
