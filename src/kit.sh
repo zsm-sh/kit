@@ -8,7 +8,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/git/fetch.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/git/sum.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/git/latest_tag.sh"
 
-function require::file() {
+# Setup the file form the given URL.
+function kit::file() {
     local file="${1}"
     local url="${2}"
     local checksum="${3:-}"
@@ -30,7 +31,17 @@ function require::file() {
     fi
 }
 
-function require::git() {
+# Setup the binary file from given URL
+function kit::bin() {
+    local file="${1}"
+    local url="${2}"
+    local checksum="${3:-}"
+    kit::file "${file}" "${url}" "${checksum}"
+    chmod +x "${file}"
+}
+
+# Setup the git directory from the given URL.
+function kit::git() {
     local dir="${1}"
     local url="${2}"
     local tag="${3:-}"
@@ -65,7 +76,7 @@ function require::git() {
     fi
 }
 
-function require() {
+function kit() {
     local modfile="${1}"
     local dir
     modfile="$(realpath "${modfile}")"
@@ -76,14 +87,16 @@ function require() {
         unset IFS
         read -r -a line <<< "${line}"
         IFS=$'\n'
-        if [[ "${line[0]}" == "require::file" || "${line[0]}" == "file" ]]; then
-            require::file "${line[1]}" "${line[2]}" "${line[3]}"
-        elif [[ "${line[0]}" == "require::git" || "${line[0]}" == "git" ]]; then
-            require::git "${line[1]}" "${line[2]}" "${line[3]}" "${line[4]}"
+        if [[ "${line[0]}" == "file" ]]; then
+            kit::file "${line[1]}" "${line[2]}" "${line[3]}"
+        elif [[ "${line[0]}" == "bin" ]]; then
+            kit::bin "${line[1]}" "${line[2]}" "${line[3]}"
+        elif [[ "${line[0]}" == "git" ]]; then
+            kit::git "${line[1]}" "${line[2]}" "${line[3]}" "${line[4]}"
         elif [[ "${line[0]}" =~ ^# ]]; then
             : # comment ignore
         else
-            log::error "Unknown require type ${line[0]}"
+            log::error "Unknown kit type ${line[0]}"
         fi
     done
     unset IFS
@@ -91,5 +104,5 @@ function require() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     modfile="${1}"
-    require "${modfile}"
+    kit "${modfile}"
 fi
