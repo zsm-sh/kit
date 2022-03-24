@@ -30,7 +30,7 @@ function kit::file() {
             return 1
         fi
 
-        sed "s| ${file} ${url}$| ${file} ${url} ${checksum}|" "${modfile}" >"${modfile}.tmp"
+        sed "s|^\(file\s\+${file}\s\+${url}\s*\)$|\1 ${checksum}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
@@ -45,7 +45,32 @@ function kit::bin() {
     local file="${1}"
     local url="${2}"
     local checksum="${3:-}"
-    kit::file "${file}" "${url}" "${checksum}"
+
+    if [[ "${checksum}" != "" ]]; then
+        current=$(crypto::sha256::sum "${file}")
+        if [[ "${current}" == "${checksum}" ]]; then
+            return
+        fi
+    fi
+
+    rm -f "${file}"
+    http::download "${file}" "${url}"
+    if [[ "${checksum}" == "" ]]; then
+        checksum=$(crypto::sha256::sum "${file}")
+        if [[ "${checksum}" == "" ]]; then
+            log::error "Fail get sha256 of ${file}"
+            return 1
+        fi
+
+        sed "s|^\(bin\s\+${file}\s\+${url}\s*\)$|\1 ${checksum}|" "${modfile}" >"${modfile}.tmp"
+        mv "${modfile}.tmp" "${modfile}"
+    fi
+
+    if [[ "${checksum}" != "$(crypto::sha256::sum "${file}")" ]]; then
+        log::error "File ${file} downloaded but its checksum is incorrect (expected ${checksum}, got $(crypto::sha256::sum "${file}"))"
+        return 1
+    fi
+
     chmod +x "${file}"
 }
 
@@ -65,7 +90,7 @@ function kit::git() {
             return 1
         fi
         git::fetch "${dir}" "${url}" "${tag}"
-        sed "s| ${dir} ${url}$| ${dir} ${url} ${tag}|" "${modfile}" >"${modfile}.tmp"
+        sed "s|^\(git\s\+${dir}\s\+${url}\s*\)$|\1 ${tag}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
@@ -75,7 +100,7 @@ function kit::git() {
             log::error "Fail get hash of ${dir}"
             return 1
         fi
-        sed "s| ${dir} ${url} ${tag}$| ${dir} ${url} ${tag} ${checksum}|" "${modfile}" >"${modfile}.tmp"
+        sed "s|^\(git\s\+${dir}\s\+${url}\s\+${tag}\s*\)$|\1 ${checksum}|" "${modfile}" >"${modfile}.tmp"
         mv "${modfile}.tmp" "${modfile}"
     fi
 
