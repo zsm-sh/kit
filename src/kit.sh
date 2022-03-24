@@ -13,6 +13,15 @@ function kit::file() {
     local file="${1}"
     local url="${2}"
     local checksum="${3:-}"
+
+    if [[ "${checksum}" != "" ]]; then
+        current=$(crypto::sha256::sum "${file}")
+        if [[ "${current}" == "${checksum}" ]]; then
+            return
+        fi
+    fi
+
+    rm -f "${file}"
     http::download "${file}" "${url}"
     if [[ "${checksum}" == "" ]]; then
         checksum=$(crypto::sha256::sum "${file}")
