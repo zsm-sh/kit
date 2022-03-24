@@ -2,6 +2,6 @@
 
 CURRENT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-"${CURRENT_DIR}/require.sh" "${CURRENT_DIR}/../require.sum"
+"${CURRENT_DIR}/kit.sh" "${CURRENT_DIR}/../vendor.kit"
 
-bash "${CURRENT_DIR}/../vendor/embed/embed.sh" --once=y "${CURRENT_DIR}/require.sh" > "${CURRENT_DIR}/../require.sh"
+bash "${CURRENT_DIR}/../vendor/embed/embed.sh" --once=y "${CURRENT_DIR}/kit.sh" > "${CURRENT_DIR}/../kit.sh"

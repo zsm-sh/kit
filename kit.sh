@@ -86,8 +86,8 @@ function log::info() {
 # {{{ source ../vendor/std/src/http/download.sh
 #!/usr/bin/env bash
 # source ../vendor/std/src/runtime/command_exist.sh # Embed file already embedded by ../vendor/std/src/crypto/sha256/sum.sh
-# source ../vendor/std/src/log/error.sh # Embed file already embedded by ../vendor/std/src/crypto/sha256/sum.sh require.sh
-# source ../vendor/std/src/log/info.sh # Embed file already embedded by require.sh
+# source ../vendor/std/src/log/error.sh # Embed file already embedded by ../vendor/std/src/crypto/sha256/sum.sh kit.sh
+# source ../vendor/std/src/log/info.sh # Embed file already embedded by kit.sh
 # source ../vendor/std/src/log/is_output.sh # Embed file already embedded by ../vendor/std/src/log/info.sh
 # Download a file from a URL
 # curl or wget are used depending on the availability of curl or wget
@@ -127,7 +127,7 @@ function http::download() {
 # }}} source ../vendor/std/src/http/download.sh
 # {{{ source git/fetch.sh
 #!/usr/bin/env bash
-# source ../vendor/std/src/log/info.sh # Embed file already embedded by require.sh ../vendor/std/src/http/download.sh
+# source ../vendor/std/src/log/info.sh # Embed file already embedded by kit.sh ../vendor/std/src/http/download.sh
 function git::fetch() (
     local dir="${1}"
     local repo="${2}"
@@ -257,9 +257,9 @@ function require() {
         unset IFS
         read -r -a line <<< "${line}"
         IFS=$'\n'
-        if [[ "${line[0]}" == "require::file" ]]; then
+        if [[ "${line[0]}" == "require::file" || "${line[0]}" == "file" ]]; then
             require::file "${line[1]}" "${line[2]}" "${line[3]}"
-        elif [[ "${line[0]}" == "require::git" ]]; then
+        elif [[ "${line[0]}" == "require::git" || "${line[0]}" == "git" ]]; then
             require::git "${line[1]}" "${line[2]}" "${line[3]}" "${line[4]}"
         elif [[ "${line[0]}" =~ ^# ]]; then
             : # comment ignore
@@ -276,13 +276,13 @@ fi
 
 #
 # ../vendor/std/src/log/verbose.sh is quoted by ../vendor/std/src/log/is_output.sh
-# ../vendor/std/src/http/download.sh is quoted by require.sh
+# ../vendor/std/src/http/download.sh is quoted by kit.sh
 # ../vendor/std/src/runtime/command_exist.sh is quoted by ../vendor/std/src/crypto/sha256/sum.sh ../vendor/std/src/http/download.sh
-# git/fetch.sh is quoted by require.sh
-# git/latest_tag.sh is quoted by require.sh
+# git/fetch.sh is quoted by kit.sh
+# git/latest_tag.sh is quoted by kit.sh
 # ../vendor/std/src/log/is_output.sh is quoted by ../vendor/std/src/log/info.sh ../vendor/std/src/http/download.sh
-# git/sum.sh is quoted by require.sh
+# git/sum.sh is quoted by kit.sh
 # ../vendor/std/src/runtime/stack_trace.sh is quoted by ../vendor/std/src/log/error.sh
-# ../vendor/std/src/log/error.sh is quoted by ../vendor/std/src/crypto/sha256/sum.sh require.sh ../vendor/std/src/http/download.sh
-# ../vendor/std/src/log/info.sh is quoted by require.sh ../vendor/std/src/http/download.sh git/fetch.sh
-# ../vendor/std/src/crypto/sha256/sum.sh is quoted by require.sh
+# ../vendor/std/src/log/error.sh is quoted by ../vendor/std/src/crypto/sha256/sum.sh kit.sh ../vendor/std/src/http/download.sh
+# ../vendor/std/src/log/info.sh is quoted by kit.sh ../vendor/std/src/http/download.sh git/fetch.sh
+# ../vendor/std/src/crypto/sha256/sum.sh is quoted by kit.sh

@@ -76,9 +76,9 @@ function require() {
         unset IFS
         read -r -a line <<< "${line}"
         IFS=$'\n'
-        if [[ "${line[0]}" == "require::file" ]]; then
+        if [[ "${line[0]}" == "require::file" || "${line[0]}" == "file" ]]; then
             require::file "${line[1]}" "${line[2]}" "${line[3]}"
-        elif [[ "${line[0]}" == "require::git" ]]; then
+        elif [[ "${line[0]}" == "require::git" || "${line[0]}" == "git" ]]; then
             require::git "${line[1]}" "${line[2]}" "${line[3]}" "${line[4]}"
         elif [[ "${line[0]}" =~ ^# ]]; then
             : # comment ignore
