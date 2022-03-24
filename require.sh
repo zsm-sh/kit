@@ -197,9 +197,6 @@ function git::latest_tag() (
     git tag -n | sort -rV | head -n 1 | awk '{print $1}'
 )
 # }}} source git/latest_tag.sh
-modfile="${1}"
-modfile="$(realpath "${modfile}")"
-dir="$(dirname "${modfile}")"
 function require::file() {
     local file="${1}"
     local url="${2}"
@@ -249,7 +246,33 @@ function require::git() {
         return 1
     fi
 }
-(cd "${dir}" && source "${modfile}")
+function require() {
+    local modfile="${1}"
+    local dir
+    modfile="$(realpath "${modfile}")"
+    dir="$(dirname "${modfile}")"
+    cd "${dir}"
+    IFS=$'\n'
+    for line in $(cat "${modfile}"); do
+        unset IFS
+        read -r -a line <<< "${line}"
+        IFS=$'\n'
+        if [[ "${line[0]}" == "require::file" ]]; then
+            require::file "${line[1]}" "${line[2]}" "${line[3]}"
+        elif [[ "${line[0]}" == "require::git" ]]; then
+            require::git "${line[1]}" "${line[2]}" "${line[3]}" "${line[4]}"
+        elif [[ "${line[0]}" =~ ^# ]]; then
+            : # comment ignore
+        else
+            log::error "Unknown require type ${line[0]}"
+        fi
+    done
+    unset IFS
+}
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    modfile="${1}"
+    require "${modfile}"
+fi
 
 #
 # ../vendor/std/src/log/verbose.sh is quoted by ../vendor/std/src/log/is_output.sh
