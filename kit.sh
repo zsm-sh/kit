@@ -315,15 +315,19 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         echo "Setup the kit from the given file."
         echo
         echo "Example:"
-        echo "  ${0} kitfile.kit"
+        echo "  ${0} vendor.kit"
         echo
         exit 1
     }
     function main() {
         local modfile="${1}"
         if [[ "${modfile}" == "" ]]; then
-            log::error "Missing kitfile.kit"
-            usage
+            if [[ -f "vendor.kit" ]]; then
+                modfile="vendor.kit"
+            else
+                log::error "Missing vendor.kit"
+                usage
+            fi
         fi
         if [[ ! -f "${modfile}" ]]; then
             log::error "File ${modfile} not found"
