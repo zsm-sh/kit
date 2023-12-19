@@ -14,7 +14,7 @@ function kit::file() {
     local url="${2}"
     local checksum="${3:-}"
 
-    if [[ "${checksum}" != "" ]]; then
+    if [[ "${checksum}" != "" && -f "${file}" ]]; then
         current=$(crypto::sha256::sum "${file}")
         if [[ "${current}" == "${checksum}" ]]; then
             return
@@ -46,7 +46,7 @@ function kit::bin() {
     local url="${2}"
     local checksum="${3:-}"
 
-    if [[ "${checksum}" != "" ]]; then
+    if [[ "${checksum}" != "" && -f "${file}" ]]; then
         current=$(crypto::sha256::sum "${file}")
         if [[ "${current}" == "${checksum}" ]]; then
             return
